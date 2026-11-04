@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { DocumentMetadata, DocumentVersion, DocumentStats, DocumentTemplate, PageLayoutSettings } from '../types/document';
 import { DOCUMENT_TEMPLATES } from '../templates/documentTemplates';
-import { exportAsWordDoc, exportAsHtml, exportAsTxt, exportAsMarkdown, exportAsRtf, exportAsJson } from '../utils/exportUtils';
+import { exportAsDocx, exportAsWordDoc, exportAsHtml, exportAsTxt, exportAsMarkdown, exportAsRtf, exportAsJson } from '../utils/exportUtils';
 import { Editor } from '@tiptap/react';
 
 interface BackstageFileMenuProps {
@@ -565,6 +565,23 @@ export const BackstageFileMenu: React.FC<BackstageFileMenuProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div
                 onClick={() => {
+                  exportAsDocx(editor, documentMeta.title);
+                  onClose();
+                }}
+                className="bg-neutral-950 hover:bg-neutral-900 border border-neutral-700 hover:border-white p-5 rounded-lg cursor-pointer transition-all space-y-2 group shadow-sm ring-1 ring-neutral-700"
+              >
+                <div className="flex items-center justify-between">
+                  <FileText className="w-5 h-5 text-white stroke-[2.2]" />
+                  <span className="text-[10px] font-bold text-white bg-neutral-800 px-2 py-0.5 rounded border border-neutral-600">RECOMMENDED</span>
+                </div>
+                <div className="font-bold text-sm text-white group-hover:underline flex items-center gap-1.5">
+                  <span>Word Document (.docx)</span>
+                </div>
+                <p className="text-xs text-neutral-400">Genuine Microsoft Word .docx format built with the docx library for standard MS Word interoperability.</p>
+              </div>
+
+              <div
+                onClick={() => {
                   exportAsWordDoc(editor, documentMeta.title);
                   onClose();
                 }}
@@ -572,10 +589,10 @@ export const BackstageFileMenu: React.FC<BackstageFileMenuProps> = ({
               >
                 <div className="flex items-center justify-between">
                   <FileText className="w-5 h-5 text-white stroke-[2.2]" />
-                  <span className="text-[10px] font-bold text-neutral-400">DOC / DOCX</span>
+                  <span className="text-[10px] font-bold text-neutral-400">DOC</span>
                 </div>
-                <div className="font-bold text-sm text-white group-hover:underline">Word Document (.doc)</div>
-                <p className="text-xs text-neutral-400">Opens in Microsoft Word, Google Docs, and LibreOffice.</p>
+                <div className="font-bold text-sm text-white group-hover:underline">Word Legacy (.doc)</div>
+                <p className="text-xs text-neutral-400">Legacy Word 97-2003 compatible document format.</p>
               </div>
 
               <div

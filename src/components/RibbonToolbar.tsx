@@ -99,26 +99,24 @@ type RibbonTab =
   | 'help';
 
 const FONT_FAMILIES = [
-  { label: 'Aptos Body (Word Default)', value: "'Aptos', 'Plus Jakarta Sans', system-ui, sans-serif" },
-  { label: 'Arial', value: 'Arial, sans-serif' },
-  { label: 'Calibri', value: 'Calibri, sans-serif' },
+  { label: 'Aptos', value: "'Aptos', 'Plus Jakarta Sans', system-ui, sans-serif" },
+  { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
+  { label: 'Calibri', value: 'Calibri, Candara, Segoe, sans-serif' },
   { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
+  { label: 'Courier New', value: "'Courier New', Courier, monospace" },
   { label: 'Georgia', value: 'Georgia, serif' },
-  { label: 'EB Garamond', value: "'EB Garamond', Garamond, serif" },
-  { label: 'JetBrains Mono', value: "'JetBrains Mono', Courier, monospace" },
-  { label: 'Plus Jakarta Sans', value: "'Plus Jakarta Sans', sans-serif" },
+  { label: 'Verdena', value: 'Verdana, Geneva, sans-serif' },
 ];
 
 const FONT_SIZES = ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '28', '32', '36', '48', '72'];
 
-// Grayscale Color Swatches
+// Specific Grayscale Color Swatches (Monochrome)
 const FONT_COLORS = [
-  { name: 'Black (#000000)', value: '#000000' },
-  { name: 'Dark Charcoal (#27272A)', value: '#27272a' },
-  { name: 'Neutral Gray (#52525B)', value: '#52525b' },
-  { name: 'Muted Gray (#71717A)', value: '#71717a' },
-  { name: 'Light Gray (#A1A1AA)', value: '#a1a1aa' },
-  { name: 'Off White (#F4F4F5)', value: '#f4f4f5' },
+  { name: 'Pure Black', value: '#000000', border: false },
+  { name: 'Dark Gray', value: '#3F3F46', border: false },
+  { name: 'Medium Gray', value: '#71717A', border: false },
+  { name: 'Light Gray', value: '#A1A1AA', border: false },
+  { name: 'White', value: '#FFFFFF', border: true },
 ];
 
 const HIGHLIGHT_COLORS = [
@@ -127,6 +125,34 @@ const HIGHLIGHT_COLORS = [
   { name: 'Medium Zinc (#E4E4E7)', value: '#e4e4e7' },
   { name: 'Dark Tint (#D4D4D8)', value: '#d4d4d8' },
   { name: 'Deep Gray (#A1A1AA)', value: '#a1a1aa' },
+];
+
+export const BASIC_SHAPES = [
+  {
+    id: 'rectangle',
+    name: 'Rectangle',
+    snippet: `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 40px; width: 220px; height: 110px; margin: 10px 12px; padding: 4px; border: 1.5px dashed #71717a; border-radius: 4px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Rectangle - drag corner to resize"><svg width="100%" height="100%" viewBox="0 0 220 110" preserveAspectRatio="none" style="display: block; pointer-events: none;"><rect x="2" y="2" width="216" height="106" rx="4" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" /></svg></div><p></p>`,
+  },
+  {
+    id: 'circle',
+    name: 'Circle',
+    snippet: `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 60px; width: 130px; height: 130px; margin: 10px 12px; padding: 4px; border: 1.5px dashed #71717a; border-radius: 4px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Circle - drag corner to resize"><svg width="100%" height="100%" viewBox="0 0 130 130" preserveAspectRatio="none" style="display: block; pointer-events: none;"><ellipse cx="65" cy="65" rx="60" ry="60" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" /></svg></div><p></p>`,
+  },
+  {
+    id: 'line',
+    name: 'Line',
+    snippet: `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: horizontal; overflow: hidden; min-width: 60px; min-height: 24px; width: 240px; height: 26px; margin: 10px 12px; padding: 2px 4px; border: 1.5px dashed #71717a; border-radius: 2px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Line - drag right edge to resize"><svg width="100%" height="100%" viewBox="0 0 240 26" preserveAspectRatio="none" style="display: block; pointer-events: none;"><line x1="4" y1="13" x2="236" y2="13" stroke="#000000" stroke-width="4" stroke-linecap="round" /></svg></div><p></p>`,
+  },
+  {
+    id: 'star',
+    name: 'Star',
+    snippet: `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 60px; width: 130px; height: 130px; margin: 10px 12px; padding: 4px; border: 1.5px dashed #71717a; border-radius: 4px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Star - drag corner to resize"><svg width="100%" height="100%" viewBox="0 0 140 140" preserveAspectRatio="none" style="display: block; pointer-events: none;"><polygon points="70,8 88,48 132,48 96,74 110,116 70,90 30,116 44,74 8,48 52,48" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" stroke-linejoin="round" /></svg></div><p></p>`,
+  },
+  {
+    id: 'arrow',
+    name: 'Arrow',
+    snippet: `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 35px; width: 190px; height: 80px; margin: 10px 12px; padding: 4px; border: 1.5px dashed #71717a; border-radius: 4px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Arrow - drag corner to resize"><svg width="100%" height="100%" viewBox="0 0 190 80" preserveAspectRatio="none" style="display: block; pointer-events: none;"><polygon points="8,26 105,26 105,8 180,40 105,72 105,54 8,54" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" stroke-linejoin="round" /></svg></div><p></p>`,
+  },
 ];
 
 export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
@@ -162,15 +188,21 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
   onChangeCase,
 }) => {
   const [activeTab, setActiveTab] = useState<RibbonTab>('home');
+  const [showFontPicker, setShowFontPicker] = useState(false);
+  const [showShapesPicker, setShowShapesPicker] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
   const [showLineHeightPicker, setShowLineHeightPicker] = useState(false);
   const [showCasePicker, setShowCasePicker] = useState(false);
 
   const ribbonRef = useRef<HTMLDivElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (ribbonRef.current && !ribbonRef.current.contains(e.target as Node)) {
+        setShowFontPicker(false);
+        setShowShapesPicker(false);
         setShowColorPicker(false);
         setShowHighlightPicker(false);
         setShowLineHeightPicker(false);
@@ -180,6 +212,29 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleTriggerImageUpload = () => {
+    imageInputRef.current?.click();
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      if (base64) {
+        editor?.chain().focus().setImage({ src: base64 }).run();
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleInsertShape = (snippet: string) => {
+    editor?.chain().focus().insertContent(snippet).run();
+    setShowShapesPicker(false);
+  };
 
   if (!editor) return null;
 
@@ -199,7 +254,16 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
   const alignRight = editor.isActive({ textAlign: 'right' });
   const alignJustify = editor.isActive({ textAlign: 'justify' });
 
-  const currentFont = editor.getAttributes('textStyle').fontFamily || FONT_FAMILIES[0].value;
+  const rawFontFamily = editor.getAttributes('textStyle').fontFamily;
+  const activeFontObj = FONT_FAMILIES.find((f) => {
+    if (!rawFontFamily) return false;
+    const cleanRaw = rawFontFamily.replace(/['"]/g, '').toLowerCase();
+    const cleanLabel = f.label.toLowerCase();
+    const cleanVal = f.value.replace(/['"]/g, '').toLowerCase();
+    return cleanRaw.includes(cleanLabel) || cleanVal.includes(cleanRaw);
+  }) || FONT_FAMILIES[0];
+  const currentFontDisplay = activeFontObj.label;
+  const currentFont = activeFontObj.value;
   const currentFontSize = (editor.getAttributes('textStyle').fontSize || '12pt').replace('pt', '');
 
   const handleFontSizeChange = (size: string) => {
@@ -336,18 +400,50 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
               <div className="space-y-1">
                 {/* Row 1: Font Family, Size, Increase/Decrease, Clear */}
                 <div className="flex items-center gap-1">
-                  <select
-                    value={currentFont}
-                    onChange={(e) => editor.chain().focus().setFontFamily(e.target.value).run()}
-                    className="bg-white border border-[#D4D4D8] hover:border-black rounded px-2 py-0.5 text-xs font-semibold focus:outline-none w-36 truncate cursor-pointer"
-                    title="Font Family"
-                  >
-                    {FONT_FAMILIES.map((f) => (
-                      <option key={f.value} value={f.value}>
-                        {f.label}
-                      </option>
-                    ))}
-                  </select>
+                  {/* Font Family Dropdown with Selection Preservation */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => {
+                        setShowFontPicker(!showFontPicker);
+                        setShowColorPicker(false);
+                        setShowHighlightPicker(false);
+                        setShowShapesPicker(false);
+                        setShowLineHeightPicker(false);
+                        setShowCasePicker(false);
+                      }}
+                      className="bg-white border border-[#D4D4D8] hover:border-black rounded px-2 py-0.5 text-xs font-semibold focus:outline-none w-36 flex items-center justify-between text-left truncate cursor-pointer h-[26px]"
+                      title="Font Family"
+                    >
+                      <span className="truncate">{currentFontDisplay}</span>
+                      <ChevronDown className="w-3 h-3 ml-1 text-neutral-600 shrink-0" />
+                    </button>
+                    {showFontPicker && (
+                      <div className="absolute top-full left-0 mt-1 bg-black text-white border border-neutral-700 rounded-md shadow-2xl py-1 z-50 w-44 max-h-60 overflow-y-auto">
+                        {FONT_FAMILIES.map((f) => (
+                          <button
+                            key={f.label}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              editor.chain().focus().setFontFamily(f.value).run();
+                              setShowFontPicker(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-1.5 text-xs hover:bg-neutral-800 text-left transition-colors ${
+                              currentFontDisplay.toLowerCase() === f.label.toLowerCase() ? 'bg-neutral-800 font-bold' : ''
+                            }`}
+                            style={{ fontFamily: f.value }}
+                          >
+                            <span>{f.label}</span>
+                            {currentFontDisplay.toLowerCase() === f.label.toLowerCase() && (
+                              <Check className="w-3.5 h-3.5 text-white shrink-0 ml-1" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
                   <select
                     value={currentFontSize}
@@ -518,9 +614,12 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
                   <div className="relative">
                     <button
                       type="button"
+                      onMouseDown={(e) => e.preventDefault()}
                       onClick={() => {
                         setShowHighlightPicker(!showHighlightPicker);
                         setShowColorPicker(false);
+                        setShowFontPicker(false);
+                        setShowShapesPicker(false);
                       }}
                       className="p-1 hover:bg-[#E4E4E7] rounded flex items-center"
                       title="Text Highlight Tone"
@@ -529,11 +628,12 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
                       <ChevronDown className="w-2 h-2 ml-0.5" />
                     </button>
                     {showHighlightPicker && (
-                      <div className="absolute top-full left-0 mt-1 bg-black text-white border border-neutral-700 rounded-md shadow-2xl p-2 z-50 w-36 space-y-1 text-xs">
+                      <div className="absolute top-full left-0 mt-1 bg-black text-white border border-neutral-700 rounded-md shadow-2xl p-2 z-50 w-40 space-y-1 text-xs">
                         {HIGHLIGHT_COLORS.map((c) => (
                           <button
                             key={c.name}
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => {
                               if (c.value) {
                                 editor.chain().focus().setHighlight({ color: c.value }).run();
@@ -552,34 +652,50 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
                     )}
                   </div>
 
-                  {/* Font Color Picker */}
+                  {/* Font Color Picker (Monochrome / Grayscale Text Colour Picker) */}
                   <div className="relative">
                     <button
                       type="button"
+                      onMouseDown={(e) => e.preventDefault()}
                       onClick={() => {
                         setShowColorPicker(!showColorPicker);
                         setShowHighlightPicker(false);
+                        setShowFontPicker(false);
+                        setShowShapesPicker(false);
                       }}
                       className="p-1 hover:bg-[#E4E4E7] rounded flex items-center"
-                      title="Font Color"
+                      title="Font Colour (Monochrome / Grayscale Text Shades)"
                     >
                       <Palette className="w-3.5 h-3.5 stroke-[2.2]" />
                       <ChevronDown className="w-2 h-2 ml-0.5" />
                     </button>
                     {showColorPicker && (
-                      <div className="absolute top-full left-0 mt-1 bg-black text-white border border-neutral-700 rounded-md shadow-2xl p-2.5 z-50 w-36 grid grid-cols-3 gap-2">
+                      <div className="absolute top-full left-0 mt-1 bg-black text-white border border-neutral-700 rounded-md shadow-2xl p-2 z-50 w-48 space-y-1">
+                        <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-2 py-1 border-b border-neutral-800">
+                          Grayscale Shades
+                        </div>
                         {FONT_COLORS.map((c) => (
                           <button
                             key={c.value}
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => {
                               editor.chain().focus().setColor(c.value).run();
                               setShowColorPicker(false);
                             }}
-                            className="w-7 h-7 rounded border border-neutral-600 hover:scale-105"
-                            style={{ backgroundColor: c.value }}
-                            title={c.name}
-                          />
+                            className="w-full flex items-center justify-between px-2 py-1.5 rounded hover:bg-neutral-800 text-left transition-colors group"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span
+                                className={`w-4 h-4 rounded shrink-0 shadow-xs group-hover:scale-110 transition-transform ${
+                                  c.border ? 'border-2 border-neutral-400' : 'border border-neutral-600'
+                                }`}
+                                style={{ backgroundColor: c.value }}
+                              />
+                              <span className="text-xs text-neutral-200 group-hover:text-white font-medium">{c.name}</span>
+                            </div>
+                            <span className="text-[10px] text-neutral-500 font-mono">{c.value}</span>
+                          </button>
                         ))}
                       </div>
                     )}
@@ -805,7 +921,7 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
             </div>
 
             {/* GROUP 5: EDITING & VOICE */}
-            <div className="flex flex-col justify-between shrink-0">
+            <div className="flex flex-col justify-between pr-2.5 border-r border-[#D4D4D8] shrink-0">
               <div className="flex items-center gap-1.5">
                 <div className="flex flex-col gap-0.5">
                   <button
@@ -843,29 +959,166 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
               </div>
               <div className="text-[10px] text-neutral-400 font-medium text-center pt-0.5">Editing & Voice</div>
             </div>
+
+            {/* GROUP 6: QUICK INSERT (PICTURE & SHAPES) */}
+            <div className="flex flex-col justify-between shrink-0">
+              <div className="flex items-center gap-1">
+                {/* Insert Picture Button */}
+                <button
+                  type="button"
+                  onClick={handleTriggerImageUpload}
+                  className="flex flex-col items-center justify-center px-2 py-1 hover:bg-[#E4E4E7] rounded transition-colors group"
+                  title="Insert Picture / Image from computer"
+                >
+                  <ImageIcon className="w-5 h-5 stroke-[2.2] text-black group-hover:scale-105" />
+                  <span className="text-[10px] font-semibold mt-0.5">Picture</span>
+                </button>
+
+                {/* Insert Shapes Dropdown */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowShapesPicker(!showShapesPicker);
+                      setShowFontPicker(false);
+                      setShowColorPicker(false);
+                      setShowHighlightPicker(false);
+                    }}
+                    className="flex flex-col items-center justify-center px-2 py-1 hover:bg-[#E4E4E7] rounded transition-colors group"
+                    title="Insert Shapes (Rectangle, Circle, Line, Star, Arrow)"
+                  >
+                    <div className="flex items-center">
+                      <Shapes className="w-5 h-5 stroke-[2.2] text-black group-hover:scale-105" />
+                      <ChevronDown className="w-2.5 h-2.5 ml-0.5" />
+                    </div>
+                    <span className="text-[10px] font-semibold mt-0.5">Shapes</span>
+                  </button>
+
+                  {showShapesPicker && (
+                    <div className="absolute top-full right-0 mt-1 bg-black text-white border border-neutral-700 rounded-md shadow-2xl p-2 z-50 w-52 space-y-1">
+                      <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-2 py-1 border-b border-neutral-800">
+                        Basic Shapes
+                      </div>
+                      {BASIC_SHAPES.map((sh) => (
+                        <button
+                          key={sh.id}
+                          type="button"
+                          onClick={() => handleInsertShape(sh.snippet)}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded hover:bg-neutral-800 text-left transition-colors"
+                        >
+                          <div className="w-5 h-5 flex items-center justify-center text-white shrink-0">
+                            {sh.id === 'rectangle' && <div className="w-4 h-2.5 border border-white bg-neutral-700" />}
+                            {sh.id === 'circle' && <div className="w-3.5 h-3.5 border border-white rounded-full bg-neutral-700" />}
+                            {sh.id === 'line' && <div className="w-4 h-0.5 bg-white" />}
+                            {sh.id === 'star' && <span className="text-sm leading-none">★</span>}
+                            {sh.id === 'arrow' && <span className="text-sm leading-none">➔</span>}
+                          </div>
+                          <span className="text-xs font-semibold">{sh.name}</span>
+                        </button>
+                      ))}
+                      <div className="pt-1 border-t border-neutral-800">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowShapesPicker(false);
+                            onOpenInsertModal('shapes');
+                          }}
+                          className="w-full text-center py-1 text-[11px] text-neutral-400 hover:text-white"
+                        >
+                          More Shapes & Visuals...
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="text-[10px] text-neutral-400 font-medium text-center pt-0.5">Visuals</div>
+            </div>
           </>
         )}
 
         {/* ================= 2. INSERT TAB ================= */}
         {activeTab === 'insert' && (
           <div className="flex items-center gap-3">
+            {/* Table */}
             <button
               type="button"
               onClick={onInsertTableModal}
-              className="flex flex-col items-center px-2.5 py-1 hover:bg-[#E4E4E7] rounded"
+              className="flex flex-col items-center px-2.5 py-1 hover:bg-[#E4E4E7] rounded group"
+              title="Insert Table"
             >
-              <TableIcon className="w-5 h-5 stroke-[2.2]" />
+              <TableIcon className="w-5 h-5 stroke-[2.2] group-hover:scale-105" />
               <span className="text-[10px] font-semibold mt-0.5">Table</span>
             </button>
 
+            {/* Picture Upload Button (with hidden input) */}
             <button
               type="button"
-              onClick={() => onOpenInsertModal('shapes')}
-              className="flex flex-col items-center px-2.5 py-1 hover:bg-[#E4E4E7] rounded"
+              onClick={handleTriggerImageUpload}
+              className="flex flex-col items-center px-2.5 py-1 hover:bg-[#E4E4E7] rounded group"
+              title="Insert Picture / Image from computer"
             >
-              <Shapes className="w-5 h-5 stroke-[2.2]" />
-              <span className="text-[10px] font-semibold mt-0.5">Shapes</span>
+              <ImageIcon className="w-5 h-5 stroke-[2.2] group-hover:scale-105" />
+              <span className="text-[10px] font-semibold mt-0.5">Picture</span>
             </button>
+
+            {/* Shapes Dropdown with Basic Shapes (Rectangle, Circle, Line, Star, Arrow) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowShapesPicker(!showShapesPicker);
+                  setShowFontPicker(false);
+                  setShowColorPicker(false);
+                  setShowHighlightPicker(false);
+                }}
+                className="flex flex-col items-center px-2.5 py-1 hover:bg-[#E4E4E7] rounded group"
+                title="Insert Shapes (Rectangle, Circle, Line, Star, Arrow)"
+              >
+                <div className="flex items-center">
+                  <Shapes className="w-5 h-5 stroke-[2.2] group-hover:scale-105" />
+                  <ChevronDown className="w-2.5 h-2.5 ml-0.5" />
+                </div>
+                <span className="text-[10px] font-semibold mt-0.5">Shapes</span>
+              </button>
+
+              {showShapesPicker && (
+                <div className="absolute top-full left-0 mt-1 bg-black text-white border border-neutral-700 rounded-md shadow-2xl p-2 z-50 w-52 space-y-1">
+                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-2 py-1 border-b border-neutral-800">
+                    Basic Shapes
+                  </div>
+                  {BASIC_SHAPES.map((sh) => (
+                    <button
+                      key={sh.id}
+                      type="button"
+                      onClick={() => handleInsertShape(sh.snippet)}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded hover:bg-neutral-800 text-left transition-colors"
+                    >
+                      <div className="w-5 h-5 flex items-center justify-center text-white shrink-0">
+                        {sh.id === 'rectangle' && <div className="w-4 h-2.5 border border-white bg-neutral-700" />}
+                        {sh.id === 'circle' && <div className="w-3.5 h-3.5 border border-white rounded-full bg-neutral-700" />}
+                        {sh.id === 'line' && <div className="w-4 h-0.5 bg-white" />}
+                        {sh.id === 'star' && <span className="text-sm leading-none">★</span>}
+                        {sh.id === 'arrow' && <span className="text-sm leading-none">➔</span>}
+                      </div>
+                      <span className="text-xs font-semibold">{sh.name}</span>
+                    </button>
+                  ))}
+                  <div className="pt-1 border-t border-neutral-800">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowShapesPicker(false);
+                        onOpenInsertModal('shapes');
+                      }}
+                      className="w-full text-center py-1 text-[11px] text-neutral-400 hover:text-white"
+                    >
+                      More Shapes & Visuals...
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <button
               type="button"
@@ -1144,6 +1397,15 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
           </div>
         )}
       </div>
+
+      {/* Hidden File Input for Image Upload */}
+      <input
+        type="file"
+        ref={imageInputRef}
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
     </div>
   );
 };

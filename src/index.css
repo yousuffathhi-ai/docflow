@@ -168,6 +168,32 @@
   user-select: none;
 }
 
+/* Responsive, movable images and shapes */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 12px auto;
+  display: block;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d4d4d8;
+  cursor: pointer;
+}
+
+.ProseMirror .doc-shape-element {
+  display: inline-block;
+  resize: both;
+  overflow: hidden;
+  vertical-align: middle;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.ProseMirror .doc-shape-element:hover {
+  box-shadow: 0 0 0 1px #000000;
+}
+
 /* Strict Word 365 Print Stylesheet */
 @media print {
   @page {

@@ -83,61 +83,99 @@ export const InsertElementsModal: React.FC<InsertElementsModalProps> = ({
           {activeTab === 'shapes' && (
             <div className="space-y-3">
               <span className="text-neutral-400 font-semibold text-xs block">
-                Select a shape to insert into your document:
+                Select a basic shape to insert directly into your document canvas (resizable & movable):
               </span>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {/* 1. Rectangle */}
                 <button
                   type="button"
                   onClick={() =>
                     insertContent(
-                      `<div style="width: 220px; height: 110px; background-color: #f4f4f5; border: 2px solid #000000; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 16px auto;">Rectangle Box</div><p></p>`
+                      `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 40px; width: 220px; height: 110px; margin: 10px 12px; padding: 4px; border: 1.5px dashed #71717a; border-radius: 4px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Rectangle - drag corner to resize"><svg width="100%" height="100%" viewBox="0 0 220 110" preserveAspectRatio="none" style="display: block; pointer-events: none;"><rect x="2" y="2" width="216" height="106" rx="4" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" /></svg></div><p></p>`
                     )
                   }
-                  className="p-4 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
+                  className="p-3 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
                 >
-                  <div className="w-16 h-10 border-2 border-white mx-auto rounded-xs bg-neutral-800 group-hover:bg-white transition-colors" />
+                  <div className="w-16 h-10 border-2 border-white mx-auto rounded-xs bg-neutral-800 group-hover:bg-white group-hover:border-black transition-colors" />
                   <span className="font-bold text-white block">Rectangle</span>
                 </button>
 
+                {/* 2. Circle */}
                 <button
                   type="button"
                   onClick={() =>
                     insertContent(
-                      `<div style="width: 220px; height: 110px; background-color: #f4f4f5; border: 2px solid #000000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 16px auto;">Rounded Box</div><p></p>`
+                      `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 60px; width: 130px; height: 130px; margin: 10px 12px; padding: 4px; border: 1.5px dashed #71717a; border-radius: 4px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Circle - drag corner to resize"><svg width="100%" height="100%" viewBox="0 0 130 130" preserveAspectRatio="none" style="display: block; pointer-events: none;"><ellipse cx="65" cy="65" rx="60" ry="60" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" /></svg></div><p></p>`
                     )
                   }
-                  className="p-4 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
+                  className="p-3 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
                 >
-                  <div className="w-16 h-10 border-2 border-white mx-auto rounded-lg bg-neutral-800 group-hover:bg-white transition-colors" />
-                  <span className="font-bold text-white block">Rounded Rect</span>
+                  <div className="w-12 h-12 border-2 border-white mx-auto rounded-full bg-neutral-800 group-hover:bg-white group-hover:border-black transition-colors" />
+                  <span className="font-bold text-white block">Circle</span>
                 </button>
 
+                {/* 3. Line */}
                 <button
                   type="button"
                   onClick={() =>
                     insertContent(
-                      `<div style="width: 140px; height: 140px; background-color: #f4f4f5; border: 2px solid #000000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 16px auto;">Circle / Oval</div><p></p>`
+                      `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: horizontal; overflow: hidden; min-width: 60px; min-height: 24px; width: 240px; height: 26px; margin: 10px 12px; padding: 2px 4px; border: 1.5px dashed #71717a; border-radius: 2px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Line - drag right edge to resize"><svg width="100%" height="100%" viewBox="0 0 240 26" preserveAspectRatio="none" style="display: block; pointer-events: none;"><line x1="4" y1="13" x2="236" y2="13" stroke="#000000" stroke-width="4" stroke-linecap="round" /></svg></div><p></p>`
                     )
                   }
-                  className="p-4 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
+                  className="p-3 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
                 >
-                  <div className="w-12 h-12 border-2 border-white mx-auto rounded-full bg-neutral-800 group-hover:bg-white transition-colors" />
-                  <span className="font-bold text-white block">Circle / Oval</span>
+                  <div className="w-16 h-1 bg-white mx-auto my-4.5 rounded-full" />
+                  <span className="font-bold text-white block">Line</span>
                 </button>
 
+                {/* 4. Star */}
                 <button
                   type="button"
                   onClick={() =>
                     insertContent(
-                      `<div style="background-color: #000000; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block; margin: 12px 0;">Notice Callout Bubble ➔</div><p></p>`
+                      `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 60px; width: 130px; height: 130px; margin: 10px 12px; padding: 4px; border: 1.5px dashed #71717a; border-radius: 4px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Star - drag corner to resize"><svg width="100%" height="100%" viewBox="0 0 140 140" preserveAspectRatio="none" style="display: block; pointer-events: none;"><polygon points="70,8 88,48 132,48 96,74 110,116 70,90 30,116 44,74 8,48 52,48" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" stroke-linejoin="round" /></svg></div><p></p>`
                     )
                   }
-                  className="p-4 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
+                  className="p-3 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
                 >
-                  <div className="w-16 h-10 bg-white mx-auto rounded-xs flex items-center justify-center text-black font-extrabold text-[10px]">
-                    TAG
+                  <div className="w-12 h-12 mx-auto flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                    <svg viewBox="0 0 24 24" className="w-10 h-10 fill-white stroke-black stroke-1">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
                   </div>
-                  <span className="font-bold text-white block">Callout Tag</span>
+                  <span className="font-bold text-white block">Star</span>
+                </button>
+
+                {/* 5. Arrow */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    insertContent(
+                      `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 35px; width: 190px; height: 80px; margin: 10px 12px; padding: 4px; border: 1.5px dashed #71717a; border-radius: 4px; background-color: #fafafa; vertical-align: middle; cursor: grab;" title="Arrow - drag corner to resize"><svg width="100%" height="100%" viewBox="0 0 190 80" preserveAspectRatio="none" style="display: block; pointer-events: none;"><polygon points="8,26 105,26 105,8 180,40 105,72 105,54 8,54" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" stroke-linejoin="round" /></svg></div><p></p>`
+                    )
+                  }
+                  className="p-3 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
+                >
+                  <div className="w-16 h-8 mx-auto flex items-center justify-center text-white group-hover:translate-x-1 transition-transform">
+                    <svg viewBox="0 0 24 24" className="w-10 h-6 fill-white stroke-black stroke-1">
+                      <polygon points="2 9 14 9 14 5 22 12 14 19 14 15 2 15" />
+                    </svg>
+                  </div>
+                  <span className="font-bold text-white block">Arrow</span>
+                </button>
+
+                {/* Rounded Box */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    insertContent(
+                      `<div class="doc-shape-element" contenteditable="false" style="display: inline-block; resize: both; overflow: hidden; min-width: 60px; min-height: 40px; width: 220px; height: 110px; background-color: #fafafa; border: 1.5px dashed #71717a; border-radius: 18px; padding: 4px; vertical-align: middle; cursor: grab;"><svg width="100%" height="100%" viewBox="0 0 220 110" preserveAspectRatio="none" style="display: block; pointer-events: none;"><rect x="2" y="2" width="216" height="106" rx="20" fill="#f4f4f5" stroke="#000000" stroke-width="2.5" /></svg></div><p></p>`
+                    )
+                  }
+                  className="p-3 bg-neutral-900 border border-neutral-800 rounded hover:border-white text-center space-y-2 group transition-all"
+                >
+                  <div className="w-16 h-10 border-2 border-white mx-auto rounded-xl bg-neutral-800 group-hover:bg-white group-hover:border-black transition-colors" />
+                  <span className="font-bold text-white block">Rounded Box</span>
                 </button>
               </div>
             </div>

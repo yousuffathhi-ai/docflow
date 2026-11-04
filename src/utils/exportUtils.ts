@@ -1,5 +1,6 @@
 import { Editor } from '@tiptap/react';
 import { PageLayoutSettings, DocumentMetadata } from '../types/document';
+export { exportAsDocx } from './docxExport';
 
 /**
  * Downloads a file to the user's computer

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Editor } from '@tiptap/react';
 import {
   Bold,
@@ -14,10 +14,14 @@ import {
   Quote,
   Minus,
   Table as TableIcon,
+  Image as ImageIcon,
+  Shapes,
   Undo2,
   Redo2,
+  Check,
 } from 'lucide-react';
 import { DocumentMargin } from '../types/document';
+import { BASIC_SHAPES } from './RibbonToolbar';
 
 interface MobileToolbarProps {
   editor: Editor | null;
@@ -26,12 +30,22 @@ interface MobileToolbarProps {
   onInsertTableModal: () => void;
 }
 
+const MOBILE_FONT_FAMILIES = [
+  { label: 'Aptos', value: "'Aptos', 'Plus Jakarta Sans', system-ui, sans-serif" },
+  { label: 'Arial', value: 'Arial, Helvetica, sans-serif' },
+  { label: 'Calibri', value: 'Calibri, Candara, Segoe, sans-serif' },
+  { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
+  { label: 'Courier New', value: "'Courier New', Courier, monospace" },
+  { label: 'Georgia', value: 'Georgia, serif' },
+  { label: 'Verdena', value: 'Verdana, Geneva, sans-serif' },
+];
+
 const TEXT_COLORS = [
-  { name: 'Pure Black', value: '#000000' },
-  { name: 'Dark Gray', value: '#404040' },
-  { name: 'Neutral Gray', value: '#737373' },
-  { name: 'Light Gray', value: '#a3a3a3' },
-  { name: 'Off White', value: '#f4f4f5' },
+  { name: 'Pure Black', value: '#000000', border: false },
+  { name: 'Dark Gray', value: '#3F3F46', border: false },
+  { name: 'Medium Gray', value: '#71717A', border: false },
+  { name: 'Light Gray', value: '#A1A1AA', border: false },
+  { name: 'White', value: '#FFFFFF', border: true },
 ];
 
 const HIGHLIGHT_COLORS = [
@@ -48,8 +62,24 @@ export const MobileToolbar: React.FC<MobileToolbarProps> = ({
   onInsertTableModal,
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const mobileImageInputRef = useRef<HTMLInputElement>(null);
 
   if (!editor) return null;
+
+  const handleMobileImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      if (base64) {
+        editor?.chain().focus().setImage({ src: base64 }).run();
+        setIsDrawerOpen(false);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const isBold = editor.isActive('bold');
   const isItalic = editor.isActive('italic');
@@ -245,21 +275,48 @@ export const MobileToolbar: React.FC<MobileToolbarProps> = ({
               </div>
             </div>
 
-            {/* Colors */}
+            {/* Font Family (Typeface) */}
             <div>
               <div className="text-xs font-bold text-neutral-400 mb-2 uppercase tracking-wide">
-                Text Shades
+                Font Family
               </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <div className="grid grid-cols-2 gap-2">
+                {MOBILE_FONT_FAMILIES.map((f) => (
+                  <button
+                    key={f.label}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      editor.chain().focus().setFontFamily(f.value).run();
+                      setIsDrawerOpen(false);
+                    }}
+                    className="py-2.5 px-3 bg-neutral-900 border border-neutral-800 rounded text-xs font-semibold text-left hover:bg-neutral-800 truncate"
+                    style={{ fontFamily: f.value }}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Colors (Monochrome Text Shades) */}
+            <div>
+              <div className="text-xs font-bold text-neutral-400 mb-2 uppercase tracking-wide">
+                Text Colour (Monochrome)
+              </div>
+              <div className="flex items-center gap-2.5 overflow-x-auto pb-1">
                 {TEXT_COLORS.map((c) => (
                   <button
                     key={c.value}
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       editor.chain().focus().setColor(c.value).run();
                       setIsDrawerOpen(false);
                     }}
-                    className="w-10 h-10 rounded-full border-2 border-neutral-600 shrink-0"
+                    className={`w-9 h-9 rounded-full shrink-0 shadow-xs active:scale-95 transition-transform flex items-center justify-center ${
+                      c.border ? 'border-2 border-neutral-400' : 'border border-neutral-600'
+                    }`}
                     style={{ backgroundColor: c.value }}
                     title={c.name}
                   />
@@ -277,6 +334,7 @@ export const MobileToolbar: React.FC<MobileToolbarProps> = ({
                   <button
                     key={c.name}
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       if (c.value) {
                         editor.chain().focus().setHighlight({ color: c.value }).run();
@@ -285,10 +343,10 @@ export const MobileToolbar: React.FC<MobileToolbarProps> = ({
                       }
                       setIsDrawerOpen(false);
                     }}
-                    className="w-10 h-10 rounded-full border-2 border-neutral-600 shrink-0 flex items-center justify-center text-xs font-bold text-black"
+                    className="w-9 h-9 rounded-full border border-neutral-600 shrink-0 flex items-center justify-center text-xs font-bold text-black"
                     style={{ backgroundColor: c.value || '#000000' }}
                   >
-                    {!c.value && <span className="text-white">None</span>}
+                    {!c.value && <span className="text-white text-[10px]">None</span>}
                   </button>
                 ))}
               </div>
@@ -297,19 +355,27 @@ export const MobileToolbar: React.FC<MobileToolbarProps> = ({
             {/* Insert Elements */}
             <div>
               <div className="text-xs font-bold text-neutral-400 mb-2 uppercase tracking-wide">
-                Insert Elements
+                Insert Visuals & Elements
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => mobileImageInputRef.current?.click()}
+                  className="min-h-[44px] flex flex-col items-center justify-center gap-1 bg-neutral-900 border border-neutral-800 rounded text-xs font-bold"
+                >
+                  <ImageIcon className="w-4.5 h-4.5 stroke-[2.2]" />
+                  <span className="text-[10px]">Picture</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => {
                     setIsDrawerOpen(false);
                     onInsertTableModal();
                   }}
-                  className="min-h-[44px] flex items-center justify-center gap-2 bg-neutral-900 border border-neutral-800 rounded text-xs font-bold"
+                  className="min-h-[44px] flex flex-col items-center justify-center gap-1 bg-neutral-900 border border-neutral-800 rounded text-xs font-bold"
                 >
                   <TableIcon className="w-4.5 h-4.5 stroke-[2.2]" />
-                  <span>Table</span>
+                  <span className="text-[10px]">Table</span>
                 </button>
                 <button
                   type="button"
@@ -317,10 +383,10 @@ export const MobileToolbar: React.FC<MobileToolbarProps> = ({
                     editor.chain().focus().toggleBlockquote().run();
                     setIsDrawerOpen(false);
                   }}
-                  className="min-h-[44px] flex items-center justify-center gap-2 bg-neutral-900 border border-neutral-800 rounded text-xs font-bold"
+                  className="min-h-[44px] flex flex-col items-center justify-center gap-1 bg-neutral-900 border border-neutral-800 rounded text-xs font-bold"
                 >
                   <Quote className="w-4.5 h-4.5 stroke-[2.2]" />
-                  <span>Quote</span>
+                  <span className="text-[10px]">Quote</span>
                 </button>
                 <button
                   type="button"
@@ -328,11 +394,40 @@ export const MobileToolbar: React.FC<MobileToolbarProps> = ({
                     editor.chain().focus().setHorizontalRule().run();
                     setIsDrawerOpen(false);
                   }}
-                  className="min-h-[44px] flex items-center justify-center gap-2 bg-neutral-900 border border-neutral-800 rounded text-xs font-bold"
+                  className="min-h-[44px] flex flex-col items-center justify-center gap-1 bg-neutral-900 border border-neutral-800 rounded text-xs font-bold"
                 >
                   <Minus className="w-4.5 h-4.5 stroke-[2.2]" />
-                  <span>Divider</span>
+                  <span className="text-[10px]">Divider</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Insert Shapes */}
+            <div>
+              <div className="text-xs font-bold text-neutral-400 mb-2 uppercase tracking-wide">
+                Insert Shapes (Rectangle, Circle, Line, Star, Arrow)
+              </div>
+              <div className="grid grid-cols-5 gap-1.5">
+                {BASIC_SHAPES.map((sh) => (
+                  <button
+                    key={sh.id}
+                    type="button"
+                    onClick={() => {
+                      editor.chain().focus().insertContent(sh.snippet).run();
+                      setIsDrawerOpen(false);
+                    }}
+                    className="py-2 px-1 bg-neutral-900 border border-neutral-800 rounded text-[10px] font-bold flex flex-col items-center gap-1 hover:bg-neutral-800 text-center"
+                  >
+                    <div className="w-4 h-4 flex items-center justify-center text-white">
+                      {sh.id === 'rectangle' && <div className="w-3.5 h-2.5 border border-white bg-neutral-700" />}
+                      {sh.id === 'circle' && <div className="w-3 h-3 border border-white rounded-full bg-neutral-700" />}
+                      {sh.id === 'line' && <div className="w-3.5 h-0.5 bg-white" />}
+                      {sh.id === 'star' && <span className="text-xs leading-none">★</span>}
+                      {sh.id === 'arrow' && <span className="text-xs leading-none">➔</span>}
+                    </div>
+                    <span className="truncate w-full">{sh.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -362,6 +457,15 @@ export const MobileToolbar: React.FC<MobileToolbarProps> = ({
           </div>
         </div>
       )}
+
+      {/* Hidden Mobile Image Input */}
+      <input
+        type="file"
+        ref={mobileImageInputRef}
+        accept="image/*"
+        onChange={handleMobileImageUpload}
+        className="hidden"
+      />
     </>
   );
 };

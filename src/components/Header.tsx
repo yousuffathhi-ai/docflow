@@ -18,6 +18,7 @@ import {
   Menu,
 } from 'lucide-react';
 import { Editor } from '@tiptap/react';
+import { exportAsDocx } from '../utils/docxExport';
 
 interface HeaderProps {
   editor: Editor | null;
@@ -269,6 +270,17 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Share2 className="w-3.5 h-3.5 stroke-[2.4]" />
           <span>Share</span>
+        </button>
+
+        {/* Quick Export to .docx Button */}
+        <button
+          type="button"
+          onClick={() => exportAsDocx(editor, documentTitle)}
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold bg-[#27272A] hover:bg-neutral-700 text-white border border-neutral-600 rounded transition-colors"
+          title="Export as Microsoft Word (.docx)"
+        >
+          <Download className="w-3.5 h-3.5 stroke-[2.2]" />
+          <span className="hidden sm:inline">.docx</span>
         </button>
 
         {/* Print Shortcut */}
