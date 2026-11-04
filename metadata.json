@@ -1,0 +1,6 @@
+{
+  "name": "DocEditor - Web Word Processor",
+  "description": "A production-ready, responsive MS Word-inspired word processor with rich text formatting, A4 page layout, export options, and local auto-save.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
