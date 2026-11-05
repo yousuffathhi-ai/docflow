@@ -51,6 +51,7 @@ import {
   Redo2,
   Check,
   RemoveFormatting,
+  BookOpen,
 } from 'lucide-react';
 import { DocumentMargin, ViewMode, PageLayoutSettings } from '../types/document';
 
@@ -85,6 +86,7 @@ interface RibbonToolbarProps {
   onTriggerAutoTOC: () => void;
   onSortSelectedLines: () => void;
   onChangeCase: (type: 'upper' | 'lower' | 'title' | 'sentence') => void;
+  onOpenWordCountModal?: () => void;
 }
 
 type RibbonTab =
@@ -117,6 +119,18 @@ const FONT_COLORS = [
   { name: 'Medium Gray', value: '#71717A', border: false },
   { name: 'Light Gray', value: '#A1A1AA', border: false },
   { name: 'White', value: '#FFFFFF', border: true },
+];
+
+const RGB_SPECTRUM_ROWS = [
+  ['#000000', '#27272A', '#52525B', '#71717A', '#A1A1AA', '#D4D4D8', '#F4F4F5', '#FFFFFF'],
+  ['#7F1D1D', '#991B1B', '#B91C1C', '#DC2626', '#EF4444', '#F87171', '#FCA5A5', '#FEE2E2'],
+  ['#7C2D12', '#9A3412', '#C2410C', '#EA580C', '#F97316', '#FB923C', '#FDBA74', '#FFEDD5'],
+  ['#78350F', '#92400E', '#B45309', '#D97706', '#F59E0B', '#FBBF24', '#FCD34D', '#FEF3C7'],
+  ['#14532D', '#166534', '#15803D', '#16A34A', '#22C55E', '#4ADE80', '#86EFAC', '#DCFCE7'],
+  ['#134E4A', '#115E59', '#0F766E', '#0D9488', '#14B8A6', '#2DD4BF', '#5EEAD4', '#CCFBF1'],
+  ['#1E3A8A', '#1E40AF', '#1D4ED8', '#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#DBEAFE'],
+  ['#581C87', '#6B21A8', '#7E22CE', '#9333EA', '#A855F7', '#C084FC', '#D8B4FE', '#F3E8FF'],
+  ['#831843', '#9D174D', '#BE185D', '#DB2777', '#EC4899', '#F472B6', '#F9A8D4', '#FCE7F3'],
 ];
 
 const HIGHLIGHT_COLORS = [
@@ -186,11 +200,13 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
   onTriggerAutoTOC,
   onSortSelectedLines,
   onChangeCase,
+  onOpenWordCountModal,
 }) => {
   const [activeTab, setActiveTab] = useState<RibbonTab>('home');
   const [showFontPicker, setShowFontPicker] = useState(false);
   const [showShapesPicker, setShowShapesPicker] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [customColorHex, setCustomColorHex] = useState('#000000');
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
   const [showLineHeightPicker, setShowLineHeightPicker] = useState(false);
   const [showCasePicker, setShowCasePicker] = useState(false);
@@ -652,7 +668,7 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
                     )}
                   </div>
 
-                  {/* Font Color Picker (Monochrome / Grayscale Text Colour Picker) */}
+                  {/* Font Color Picker (Full RGB Color Palette & Custom Picker) */}
                   <div className="relative">
                     <button
                       type="button"
@@ -664,39 +680,127 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
                         setShowShapesPicker(false);
                       }}
                       className="p-1 hover:bg-[#E4E4E7] rounded flex items-center"
-                      title="Font Colour (Monochrome / Grayscale Text Shades)"
+                      title="Font Colour (RGB Color Palette & Custom Picker)"
                     >
                       <Palette className="w-3.5 h-3.5 stroke-[2.2]" />
                       <ChevronDown className="w-2 h-2 ml-0.5" />
                     </button>
                     {showColorPicker && (
-                      <div className="absolute top-full left-0 mt-1 bg-black text-white border border-neutral-700 rounded-md shadow-2xl p-2 z-50 w-48 space-y-1">
-                        <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider px-2 py-1 border-b border-neutral-800">
-                          Grayscale Shades
-                        </div>
-                        {FONT_COLORS.map((c) => (
+                      <div
+                        className="absolute top-full left-0 mt-1 bg-neutral-900 text-white border border-neutral-700 rounded-lg shadow-2xl p-3 z-50 w-64 space-y-2.5 animate-in fade-in duration-150"
+                        onMouseDown={(e) => e.preventDefault()}
+                      >
+                        {/* Header & Reset */}
+                        <div className="flex items-center justify-between pb-1.5 border-b border-neutral-800">
+                          <span className="text-[11px] font-bold text-neutral-300 uppercase tracking-wider">
+                            Font Colour
+                          </span>
                           <button
-                            key={c.value}
                             type="button"
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => {
-                              editor.chain().focus().setColor(c.value).run();
+                              editor.chain().focus().unsetColor().run();
                               setShowColorPicker(false);
                             }}
-                            className="w-full flex items-center justify-between px-2 py-1.5 rounded hover:bg-neutral-800 text-left transition-colors group"
+                            className="text-[10px] text-neutral-400 hover:text-white underline cursor-pointer"
                           >
-                            <div className="flex items-center gap-2.5">
-                              <span
-                                className={`w-4 h-4 rounded shrink-0 shadow-xs group-hover:scale-110 transition-transform ${
-                                  c.border ? 'border-2 border-neutral-400' : 'border border-neutral-600'
-                                }`}
-                                style={{ backgroundColor: c.value }}
-                              />
-                              <span className="text-xs text-neutral-200 group-hover:text-white font-medium">{c.name}</span>
-                            </div>
-                            <span className="text-[10px] text-neutral-500 font-mono">{c.value}</span>
+                            Automatic (Default)
                           </button>
-                        ))}
+                        </div>
+
+                        {/* Monochrome Quick Swatches */}
+                        <div>
+                          <div className="text-[10px] font-semibold text-neutral-400 mb-1">Theme Grays</div>
+                          <div className="grid grid-cols-8 gap-1">
+                            {RGB_SPECTRUM_ROWS[0].map((hex) => (
+                              <button
+                                key={`mono-${hex}`}
+                                type="button"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => {
+                                  editor.chain().focus().setColor(hex).run();
+                                  setCustomColorHex(hex);
+                                  setShowColorPicker(false);
+                                }}
+                                className="w-6 h-6 rounded-xs border border-neutral-600 hover:scale-115 transition-transform"
+                                style={{ backgroundColor: hex }}
+                                title={hex}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Standard Spectrum RGB Palette */}
+                        <div>
+                          <div className="text-[10px] font-semibold text-neutral-400 mb-1">Standard RGB Palette</div>
+                          <div className="space-y-1">
+                            {RGB_SPECTRUM_ROWS.slice(1).map((row, rIdx) => (
+                              <div key={`row-${rIdx}`} className="grid grid-cols-8 gap-1">
+                                {row.map((hex) => (
+                                  <button
+                                    key={hex}
+                                    type="button"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => {
+                                      editor.chain().focus().setColor(hex).run();
+                                      setCustomColorHex(hex);
+                                      setShowColorPicker(false);
+                                    }}
+                                    className="w-6 h-6 rounded-xs border border-neutral-700/60 hover:scale-115 transition-transform"
+                                    style={{ backgroundColor: hex }}
+                                    title={hex}
+                                  />
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Custom RGB Color Picker & Hex Input */}
+                        <div className="pt-2 border-t border-neutral-800 space-y-1.5">
+                          <div className="text-[10px] font-semibold text-neutral-400">Custom RGB Color</div>
+                          <div className="flex items-center gap-2">
+                            <div className="relative w-8 h-8 rounded border border-neutral-600 overflow-hidden shrink-0 cursor-pointer">
+                              <input
+                                type="color"
+                                value={customColorHex}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onChange={(e) => {
+                                  const hex = e.target.value;
+                                  setCustomColorHex(hex);
+                                  editor.chain().focus().setColor(hex).run();
+                                }}
+                                className="absolute -top-2 -left-2 w-12 h-12 cursor-pointer bg-transparent border-0"
+                                title="Pick RGB Color"
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              value={customColorHex}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onChange={(e) => setCustomColorHex(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  editor.chain().focus().setColor(customColorHex).run();
+                                  setShowColorPicker(false);
+                                }
+                              }}
+                              className="flex-1 px-2 py-1 bg-neutral-800 text-white border border-neutral-700 rounded text-xs font-mono uppercase"
+                              placeholder="#000000"
+                            />
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => {
+                                editor.chain().focus().setColor(customColorHex).run();
+                                setShowColorPicker(false);
+                              }}
+                              className="px-2.5 py-1 bg-white text-black hover:bg-neutral-200 rounded text-xs font-bold transition-colors"
+                            >
+                              Apply
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1313,6 +1417,15 @@ export const RibbonToolbar: React.FC<RibbonToolbarProps> = ({
             >
               <FileText className="w-5 h-5 stroke-[2.2]" />
               <span className="text-[10px] font-semibold mt-0.5">Review Comments</span>
+            </button>
+            <button
+              type="button"
+              onClick={onOpenWordCountModal}
+              className="flex flex-col items-center px-3 py-1 hover:bg-[#E4E4E7] rounded group"
+              title="Word Count & Section Statistics"
+            >
+              <BookOpen className="w-5 h-5 stroke-[2.2] group-hover:scale-105" />
+              <span className="text-[10px] font-semibold mt-0.5">Word Count</span>
             </button>
             <button
               type="button"

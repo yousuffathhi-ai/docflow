@@ -23,6 +23,7 @@ interface StatusBarProps {
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
   accessibilityIssuesCount?: number;
+  onOpenWordCountModal?: () => void;
 }
 
 export const StatusBar: React.FC<StatusBarProps> = ({
@@ -34,6 +35,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
   isFullscreen,
   onToggleFullscreen,
   accessibilityIssuesCount = 0,
+  onOpenWordCountModal,
 }) => {
   const handleZoomIn = () => {
     onZoomChange(Math.min(150, zoomLevel + 10));
@@ -56,10 +58,15 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           Page 1 of {stats.estimatedPages}
         </span>
 
-        {/* Word Count */}
-        <span className="hover:bg-[#E4E4E7] px-1.5 py-0.5 rounded cursor-pointer whitespace-nowrap tabular-nums">
-          {stats.words.toLocaleString()} words
-        </span>
+        {/* Word Count with modal trigger */}
+        <button
+          type="button"
+          onClick={onOpenWordCountModal}
+          className="hover:bg-[#E4E4E7] active:bg-[#D4D4D8] px-1.5 py-0.5 rounded cursor-pointer whitespace-nowrap tabular-nums font-semibold text-[#09090B] flex items-center gap-1 transition-colors"
+          title="Click to view detailed Word Count and Section Breakdown"
+        >
+          <span>{stats.words.toLocaleString()} words</span>
+        </button>
 
         {/* Accessibility Status Check */}
         <div className="hidden sm:flex items-center gap-1 hover:bg-[#E4E4E7] px-1.5 py-0.5 rounded cursor-pointer whitespace-nowrap">

@@ -114,3 +114,31 @@ export interface PageLayoutSettings {
   footerText: string;
   showPageNumbers: boolean;
 }
+
+export interface SectionWordCount {
+  id: string;
+  title: string;
+  level: number;
+  wordCount: number;
+  characterCount: number;
+  paragraphCount: number;
+  percentage: number;
+  readingTimeMinutes: number;
+}
+
+export type TextWrapMode = 'inline' | 'square-left' | 'square-right' | 'behind' | 'in-front';
+
+export interface ImageFormattingOptions {
+  rotation: number;
+  flipH: boolean;
+  flipV: boolean;
+  wrapMode: TextWrapMode;
+  brightness: number;
+  contrast: number;
+  grayscale: number;
+  sepia: number;
+  borderRadius: number;
+  borderWidth: number;
+  borderColor: string;
+  shadow: 'none' | 'sm' | 'md' | 'lg';
+}

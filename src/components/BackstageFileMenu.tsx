@@ -23,10 +23,15 @@ import {
   User,
   Building,
   FileCheck,
+  Settings,
+  SpellCheck,
+  CheckCircle2,
+  Search,
 } from 'lucide-react';
 import { DocumentMetadata, DocumentVersion, DocumentStats, DocumentTemplate, PageLayoutSettings } from '../types/document';
 import { DOCUMENT_TEMPLATES } from '../templates/documentTemplates';
 import { exportAsDocx, exportAsWordDoc, exportAsHtml, exportAsTxt, exportAsMarkdown, exportAsRtf, exportAsJson } from '../utils/exportUtils';
+import { isAutoCorrectEnabled, setAutoCorrectEnabled, findDocumentTypos, correctWord } from '../utils/dictionaryService';
 import { Editor } from '@tiptap/react';
 
 interface BackstageFileMenuProps {
@@ -50,7 +55,7 @@ interface BackstageFileMenuProps {
   onOpenPasswordModal: () => void;
 }
 
-type BackstageTab = 'info' | 'new' | 'open' | 'saveas' | 'history' | 'export' | 'share';
+type BackstageTab = 'info' | 'new' | 'open' | 'saveas' | 'history' | 'export' | 'share' | 'options';
 
 export const BackstageFileMenu: React.FC<BackstageFileMenuProps> = ({
   isOpen,
@@ -76,6 +81,9 @@ export const BackstageFileMenu: React.FC<BackstageFileMenuProps> = ({
   const [saveAsTitle, setSaveAsTitle] = useState(documentMeta.title + ' (Copy)');
   const [snapshotSummary, setSnapshotSummary] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
+  const [autoCorrect, setAutoCorrect] = useState<boolean>(() => isAutoCorrectEnabled());
+  const [testInput, setTestInput] = useState<string>('');
+  const [detectedTypos, setDetectedTypos] = useState<Array<{ word: string; replacement: string; count: number }>>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -213,6 +221,22 @@ export const BackstageFileMenu: React.FC<BackstageFileMenuProps> = ({
           >
             <Share2 className="w-4 h-4 stroke-[2.2]" />
             <span>Share Document</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('options');
+              if (editor) {
+                setDetectedTypos(findDocumentTypos(editor.getText()));
+              }
+            }}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold rounded transition-colors text-left ${
+              activeTab === 'options' ? 'bg-white text-black' : 'text-neutral-300 hover:bg-neutral-900'
+            }`}
+          >
+            <Settings className="w-4 h-4 stroke-[2.2]" />
+            <span>Options & Proofing</span>
           </button>
         </div>
       </div>
@@ -720,6 +744,160 @@ export const BackstageFileMenu: React.FC<BackstageFileMenuProps> = ({
                   Draft Email with Document Snippet
                 </a>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= TAB 8: OPTIONS & AUTO-CORRECT ================= */}
+        {activeTab === 'options' && (
+          <div className="max-w-3xl space-y-6">
+            <h2 className="text-xl font-bold tracking-tight pb-3 border-b border-neutral-800 flex items-center gap-2.5">
+              <Settings className="w-5 h-5 text-neutral-300" />
+              Word Options & Auto-Correct Proofing
+            </h2>
+
+            {/* Auto-Correct Toggle Card */}
+            <div className="bg-neutral-950 border border-neutral-800 rounded-lg p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <SpellCheck className="w-4 h-4 text-neutral-300" />
+                    Auto-Correct As You Type
+                  </h3>
+                  <p className="text-xs text-neutral-400 mt-0.5">
+                    Automatically replace common typographical mistakes as you type (e.g. &quot;teh&quot; → &quot;the&quot;, &quot;recieve&quot; → &quot;receive&quot;).
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !autoCorrect;
+                    setAutoCorrect(next);
+                    setAutoCorrectEnabled(next);
+                  }}
+                  className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors ${
+                    autoCorrect ? 'bg-white justify-end' : 'bg-neutral-800 justify-start'
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded-full ${autoCorrect ? 'bg-black' : 'bg-neutral-500'}`} />
+                </button>
+              </div>
+
+              {/* Interactive Test Playground */}
+              <div className="pt-3 border-t border-neutral-800 space-y-2">
+                <label className="text-[11px] font-semibold text-neutral-400 block uppercase tracking-wide">
+                  Try Auto-Correct in action:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={testInput}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setTestInput(val);
+                      // If ends with space, test autocorrect on preceding word
+                      if (val.endsWith(' ')) {
+                        const words = val.trim().split(/\s+/);
+                        const lastWord = words[words.length - 1];
+                        const fixed = correctWord(lastWord);
+                        if (fixed && fixed.toLowerCase() !== lastWord.toLowerCase()) {
+                          words[words.length - 1] = fixed;
+                          setTestInput(words.join(' ') + ' ');
+                        }
+                      }
+                    }}
+                    placeholder="Type 'teh', 'seperate', 'definately' and hit space..."
+                    className="flex-1 px-3 py-2 bg-neutral-900 border border-neutral-700 rounded text-xs text-white placeholder-neutral-500 font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setTestInput('The separate and definite accommodation')}
+                    className="px-3 py-2 bg-neutral-800 text-neutral-300 hover:text-white rounded text-xs"
+                  >
+                    Load Sample
+                  </button>
+                </div>
+                <p className="text-[10px] text-neutral-500">
+                  Tip: Auto-Correct triggers immediately in the document canvas whenever you finish typing a word with a space or punctuation mark.
+                </p>
+              </div>
+            </div>
+
+            {/* Document Scan & Batch Fix Card */}
+            <div className="bg-neutral-950 border border-neutral-800 rounded-lg p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-neutral-300" />
+                    Document Typo Scanner
+                  </h3>
+                  <p className="text-xs text-neutral-400 mt-0.5">
+                    Scan the entire document against the dictionary for known misspellings.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editor) {
+                      setDetectedTypos(findDocumentTypos(editor.getText()));
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white rounded text-xs font-semibold"
+                >
+                  Scan Document
+                </button>
+              </div>
+
+              {detectedTypos.length > 0 ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-amber-400 font-semibold">
+                      Found {detectedTypos.length} potential typo(s) in document:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!editor) return;
+                        let html = editor.getHTML();
+                        detectedTypos.forEach(({ word, replacement }) => {
+                          const regex = new RegExp(`\\b${word}\\b`, 'g');
+                          html = html.replace(regex, replacement);
+                        });
+                        editor.commands.setContent(html);
+                        setDetectedTypos([]);
+                      }}
+                      className="px-3 py-1 bg-white text-black hover:bg-neutral-200 rounded text-xs font-bold transition-colors"
+                    >
+                      Correct All in Document
+                    </button>
+                  </div>
+
+                  <div className="border border-neutral-800 rounded overflow-hidden max-h-48 overflow-y-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-neutral-900 text-neutral-400">
+                        <tr>
+                          <th className="py-1.5 px-3">Typo</th>
+                          <th className="py-1.5 px-3">Auto-Correction</th>
+                          <th className="py-1.5 px-3 text-right">Occurrences</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-neutral-850">
+                        {detectedTypos.map((t, idx) => (
+                          <tr key={idx} className="hover:bg-neutral-900/50">
+                            <td className="py-1.5 px-3 font-mono text-red-400">{t.word}</td>
+                            <td className="py-1.5 px-3 font-mono text-green-400">{t.replacement}</td>
+                            <td className="py-1.5 px-3 text-right text-neutral-400">{t.count}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-neutral-400 italic bg-neutral-900/50 p-3 rounded border border-neutral-800 text-center">
+                  No common typos currently detected in your document. Everything looks clean!
+                </p>
+              )}
             </div>
           </div>
         )}

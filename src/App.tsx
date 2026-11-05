@@ -53,6 +53,9 @@ import { VoiceTypingWidget } from './components/VoiceTypingWidget';
 import { ReadAloudWidget } from './components/ReadAloudWidget';
 import { ShareModal } from './components/ShareModal';
 import { MobileToolbar } from './components/MobileToolbar';
+import { WordCountModal } from './components/WordCountModal';
+import { ImageEditorPanel } from './components/ImageEditorPanel';
+import { isAutoCorrectEnabled, correctWord } from './utils/dictionaryService';
 
 const STORAGE_KEY_DOCS = 'doceditor_documents_v3';
 const STORAGE_KEY_ACTIVE_ID = 'doceditor_active_id_v3';
@@ -142,6 +145,9 @@ export default function App() {
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [formatPainterActive, setFormatPainterActive] = useState<boolean>(false);
   const [copiedFormat, setCopiedFormat] = useState<any>(null);
+  const [isWordCountModalOpen, setIsWordCountModalOpen] = useState<boolean>(false);
+  const [selectedImageElement, setSelectedImageElement] = useState<HTMLImageElement | null>(null);
+  const [isImageEditorOpen, setIsImageEditorOpen] = useState<boolean>(false);
 
   // Sidebars
   const [navigationPaneOpen, setNavigationPaneOpen] = useState<boolean>(false);
@@ -241,6 +247,28 @@ export default function App() {
     editorProps: {
       attributes: {
         class: 'focus:outline-none min-h-[500px]',
+      },
+      handleKeyDown(view, event) {
+        if (event.key === ' ' || event.key === '.' || event.key === ',' || event.key === '!' || event.key === '?') {
+          if (!isAutoCorrectEnabled()) return false;
+          const { state, dispatch } = view;
+          const { selection } = state;
+          const { $from } = selection;
+          if (!$from || $from.pos < 2) return false;
+          
+          const textBefore = $from.parent.textBetween(0, $from.parentOffset, undefined, '\uFFFC');
+          const match = textBefore.match(/\b([A-Za-z]+)$/);
+          if (match) {
+            const typo = match[1];
+            const fixed = correctWord(typo);
+            if (fixed && fixed.toLowerCase() !== typo.toLowerCase()) {
+              const startPos = $from.pos - typo.length;
+              const tr = state.tr.replaceWith(startPos, $from.pos, state.schema.text(fixed));
+              dispatch(tr);
+            }
+          }
+        }
+        return false;
       },
     },
     onUpdate: ({ editor }) => {
@@ -644,69 +672,76 @@ export default function App() {
     }
   }, []);
 
+  const isFocusMode = viewMode === 'focus';
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#F4F4F5] text-black antialiased select-text">
-      {/* 1. Top Header Bar */}
-      <Header
-        editor={editor}
-        documentTitle={documentMeta.title}
-        onTitleChange={(newTitle) => setDocumentMeta((prev) => ({ ...prev, title: newTitle }))}
-        saveStatus={saveStatus}
-        autoSaveEnabled={autoSaveEnabled}
-        onToggleAutoSave={handleToggleAutoSave}
-        onManualSave={handleManualSave}
-        editingMode={editingMode}
-        onChangeEditingMode={handleChangeEditingMode}
-        onToggleComments={() => setCommentsOpen(!commentsOpen)}
-        commentsCount={comments.filter((c) => !c.resolved).length}
-        onOpenShareModal={() => setIsShareModalOpen(true)}
-        onTriggerPrint={() => setIsPrintPreviewOpen(true)}
-        onSearchFocus={() => setIsFindReplaceOpen(true)}
-        onSearchChange={setSearchQuery}
-        searchQuery={searchQuery}
-      />
+      {/* 1. Top Header Bar (Hidden in Focus Mode) */}
+      {!isFocusMode && (
+        <Header
+          editor={editor}
+          documentTitle={documentMeta.title}
+          onTitleChange={(newTitle) => setDocumentMeta((prev) => ({ ...prev, title: newTitle }))}
+          saveStatus={saveStatus}
+          autoSaveEnabled={autoSaveEnabled}
+          onToggleAutoSave={handleToggleAutoSave}
+          onManualSave={handleManualSave}
+          editingMode={editingMode}
+          onChangeEditingMode={handleChangeEditingMode}
+          onToggleComments={() => setCommentsOpen(!commentsOpen)}
+          commentsCount={comments.filter((c) => !c.resolved).length}
+          onOpenShareModal={() => setIsShareModalOpen(true)}
+          onTriggerPrint={() => setIsPrintPreviewOpen(true)}
+          onSearchFocus={() => setIsFindReplaceOpen(true)}
+          onSearchChange={setSearchQuery}
+          searchQuery={searchQuery}
+        />
+      )}
 
-      {/* 2. Desktop MS Word Ribbon Toolbar */}
-      <RibbonToolbar
-        editor={editor}
-        onOpenFileMenu={() => setIsBackstageOpen(true)}
-        rulerVisible={rulerVisible}
-        onToggleRuler={() => setRulerVisible(!rulerVisible)}
-        viewMode={viewMode}
-        onChangeViewMode={setViewMode}
-        layoutSettings={layoutSettings}
-        onUpdateLayoutSettings={(s) => setLayoutSettings({ ...layoutSettings, ...s })}
-        onInsertTableModal={() => setIsTableModalOpen(true)}
-        onOpenFindReplace={() => setIsFindReplaceOpen(true)}
-        onOpenInsertModal={(tab) => {
-          setInsertModalTab(tab || 'shapes');
-          setIsInsertModalOpen(true);
-        }}
-        onOpenMailMerge={() => setIsMailMergeOpen(true)}
-        onOpenCitations={() => setIsCitationsOpen(true)}
-        onToggleNavigationPane={() => setNavigationPaneOpen(!navigationPaneOpen)}
-        navigationPaneOpen={navigationPaneOpen}
-        onToggleComments={() => setCommentsOpen(!commentsOpen)}
-        commentsOpen={commentsOpen}
-        onToggleProofing={() => setProofingOpen(!proofingOpen)}
-        proofingOpen={proofingOpen}
-        onOpenVoiceTyping={() => setIsVoiceTypingOpen(!isVoiceTypingOpen)}
-        onOpenReadAloud={() => setIsReadAloudOpen(!isReadAloudOpen)}
-        showGridlines={showGridlines}
-        onToggleGridlines={() => setShowGridlines(!showGridlines)}
-        showFormattingMarks={showFormattingMarks}
-        onToggleFormattingMarks={() => setShowFormattingMarks(!showFormattingMarks)}
-        formatPainterActive={formatPainterActive}
-        onToggleFormatPainter={handleToggleFormatPainter}
-        onTriggerAutoTOC={handleTriggerAutoTOC}
-        onSortSelectedLines={handleSortSelectedLines}
-        onChangeCase={handleChangeCase}
-      />
+      {/* 2. Desktop MS Word Ribbon Toolbar (Hidden in Focus Mode) */}
+      {!isFocusMode && (
+        <RibbonToolbar
+          editor={editor}
+          onOpenFileMenu={() => setIsBackstageOpen(true)}
+          rulerVisible={rulerVisible}
+          onToggleRuler={() => setRulerVisible(!rulerVisible)}
+          viewMode={viewMode}
+          onChangeViewMode={setViewMode}
+          layoutSettings={layoutSettings}
+          onUpdateLayoutSettings={(s) => setLayoutSettings({ ...layoutSettings, ...s })}
+          onInsertTableModal={() => setIsTableModalOpen(true)}
+          onOpenFindReplace={() => setIsFindReplaceOpen(true)}
+          onOpenInsertModal={(tab) => {
+            setInsertModalTab(tab || 'shapes');
+            setIsInsertModalOpen(true);
+          }}
+          onOpenMailMerge={() => setIsMailMergeOpen(true)}
+          onOpenCitations={() => setIsCitationsOpen(true)}
+          onToggleNavigationPane={() => setNavigationPaneOpen(!navigationPaneOpen)}
+          navigationPaneOpen={navigationPaneOpen}
+          onToggleComments={() => setCommentsOpen(!commentsOpen)}
+          commentsOpen={commentsOpen}
+          onToggleProofing={() => setProofingOpen(!proofingOpen)}
+          proofingOpen={proofingOpen}
+          onOpenVoiceTyping={() => setIsVoiceTypingOpen(!isVoiceTypingOpen)}
+          onOpenReadAloud={() => setIsReadAloudOpen(!isReadAloudOpen)}
+          showGridlines={showGridlines}
+          onToggleGridlines={() => setShowGridlines(!showGridlines)}
+          showFormattingMarks={showFormattingMarks}
+          onToggleFormattingMarks={() => setShowFormattingMarks(!showFormattingMarks)}
+          formatPainterActive={formatPainterActive}
+          onToggleFormatPainter={handleToggleFormatPainter}
+          onTriggerAutoTOC={handleTriggerAutoTOC}
+          onSortSelectedLines={handleSortSelectedLines}
+          onChangeCase={handleChangeCase}
+          onOpenWordCountModal={() => setIsWordCountModalOpen(true)}
+        />
+      )}
 
       {/* 3. Main Workspace with Dockable Sidebars */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left Navigation Pane */}
-        {navigationPaneOpen && (
+        {!isFocusMode && navigationPaneOpen && (
           <NavigationPane
             isOpen={navigationPaneOpen}
             onClose={() => setNavigationPaneOpen(false)}
@@ -724,10 +759,15 @@ export default function App() {
           showGridlines={showGridlines}
           showFormattingMarks={showFormattingMarks}
           isReadOnly={documentMeta.isReadOnly}
+          onSelectImage={(img) => {
+            setSelectedImageElement(img);
+            setIsImageEditorOpen(true);
+          }}
+          onExitFocusMode={() => setViewMode('page')}
         />
 
         {/* Right Comments & Track Changes Sidebar */}
-        {commentsOpen && (
+        {!isFocusMode && commentsOpen && (
           <CommentsSidebar
             isOpen={commentsOpen}
             onClose={() => setCommentsOpen(false)}
@@ -750,7 +790,7 @@ export default function App() {
         )}
 
         {/* Right Proofing & Thesaurus Sidebar */}
-        {proofingOpen && (
+        {!isFocusMode && proofingOpen && (
           <ProofingSidebar
             isOpen={proofingOpen}
             onClose={() => setProofingOpen(false)}
@@ -770,6 +810,7 @@ export default function App() {
         onToggleRuler={() => setRulerVisible(!rulerVisible)}
         isFullscreen={isFullscreen}
         onToggleFullscreen={handleToggleFullscreen}
+        onOpenWordCountModal={() => setIsWordCountModalOpen(true)}
       />
 
       {/* ================= MODAL DIALOGS ================= */}
@@ -884,18 +925,55 @@ export default function App() {
       />
 
       {/* Touch-Optimized Mobile Toolbar */}
-      <MobileToolbar
-        editor={editor}
-        marginPreset={layoutSettings.marginPreset}
-        onChangeMarginPreset={(m) => setLayoutSettings({ ...layoutSettings, marginPreset: m })}
-        onInsertTableModal={() => setIsTableModalOpen(true)}
-      />
+      {!isFocusMode && (
+        <MobileToolbar
+          editor={editor}
+          marginPreset={layoutSettings.marginPreset}
+          onChangeMarginPreset={(m) => setLayoutSettings({ ...layoutSettings, marginPreset: m })}
+          onInsertTableModal={() => setIsTableModalOpen(true)}
+        />
+      )}
 
       {/* Word 365 Share Modal */}
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         documentTitle={documentMeta.title}
+      />
+
+      {/* Floating Image Editor Suite Panel */}
+      <ImageEditorPanel
+        imageElement={selectedImageElement}
+        isOpen={isImageEditorOpen && !!selectedImageElement}
+        onClose={() => setIsImageEditorOpen(false)}
+        onUpdateContent={() => {
+          if (editor) {
+            const html = editor.getHTML();
+            setDocuments((prev) =>
+              prev.map((doc) =>
+                doc.id === activeDocId ? { ...doc, content: html, updatedAt: new Date().toISOString() } : doc
+              )
+            );
+          }
+        }}
+        onDeleteImage={() => {
+          if (selectedImageElement) {
+            selectedImageElement.remove();
+            setSelectedImageElement(null);
+            setIsImageEditorOpen(false);
+            if (editor) {
+              editor.commands.setContent(editor.getHTML());
+            }
+          }
+        }}
+      />
+
+      {/* Detailed Word Count & Section Statistics Modal */}
+      <WordCountModal
+        isOpen={isWordCountModalOpen}
+        onClose={() => setIsWordCountModalOpen(false)}
+        stats={stats}
+        htmlContent={editor?.getHTML() || ''}
       />
     </div>
   );
